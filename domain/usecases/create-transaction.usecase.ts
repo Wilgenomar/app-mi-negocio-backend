@@ -39,7 +39,10 @@ export class CreateTransactionUseCase {
   }
 
   private getAmountChange(type: TransactionType, amount: number): number {
-    if (type === TransactionType.OUT) {
+    if (
+      type === TransactionType.TRANSFER_OUT ||
+      type === TransactionType.WITHDRAWAL
+    ) {
       return -amount;
     }
     return amount;

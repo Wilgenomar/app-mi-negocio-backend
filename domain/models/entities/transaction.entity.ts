@@ -5,14 +5,14 @@ export class Transaction {
   constructor(
     public type: TransactionType,
     public amount: number,
-    public accountType: string,
-    public accountNumber: string,
-    public name: string,
-    public documentType: string,
-    public documentNumber: string,
-    public bank: string,
-    public createdAt: Date,
-    public updatedAt: Date,
     public description?: string,
+    public accountType?: string,
+    public accountNumber?: string,
+    public name?: string,
+    public documentType?: string,
+    public documentNumber?: string,
+    public bank?: string,
+    public createdAt?: Date,
+    public updatedAt?: Date,
   ) {}
 }

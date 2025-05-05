@@ -6,7 +6,7 @@ import {
   IsString,
 } from 'class-validator';
 
-export class CreateTransactionDto {
+export class CreateTransferTransactionDto {
   @IsNumber()
   @Min(500)
   amount: number;
