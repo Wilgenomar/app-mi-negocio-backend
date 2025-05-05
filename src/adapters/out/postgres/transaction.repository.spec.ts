@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/unbound-method */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { TransactionRepository } from './transaction.repository';
 import { EntityManager, Between, FindOptionsWhere } from 'typeorm';
 import { mock, MockProxy } from 'jest-mock-extended';
@@ -162,5 +163,74 @@ describe('TransactionRepository', () => {
       skip: 0,
       take: 10,
     });
+  });
+
+  it('should save a transaction and update the balance', async () => {
+    const transaction = new Transaction(
+      TransactionType.IN,
+      100,
+      'Savings',
+      '123456',
+      'John Doe',
+      'ID',
+      '123456789',
+      'Bank A',
+      new Date(),
+      new Date(),
+      'Test transaction',
+    );
+
+    const amountChange = 100;
+
+    entityManager.transaction.mockImplementation(async (callback) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return await callback(entityManager);
+    });
+
+    entityManager.save.mockResolvedValue(transaction);
+    entityManager.query.mockResolvedValue(undefined);
+
+    const result = await transactionRepository.saveAndUpdateBalance(
+      transaction,
+      amountChange,
+    );
+
+    expect(result).toEqual(transaction);
+    expect(entityManager.transaction).toHaveBeenCalledTimes(1);
+    expect(entityManager.save).toHaveBeenCalledWith(Transaction, transaction);
+    expect(entityManager.query).toHaveBeenCalledWith(
+      `UPDATE balances SET amount = amount + $1 `,
+      [amountChange],
+    );
+  });
+
+  it('should throw an error if saving the transaction or updating the balance fails', async () => {
+    const transaction = new Transaction(
+      TransactionType.IN,
+      100,
+      'Savings',
+      '123456',
+      'John Doe',
+      'ID',
+      '123456789',
+      'Bank A',
+      new Date(),
+      new Date(),
+      'Test transaction',
+    );
+
+    const amountChange = 100;
+
+    entityManager.transaction.mockRejectedValue(
+      new Error('Transaction failed'),
+    );
+
+    await expect(
+      transactionRepository.saveAndUpdateBalance(transaction, amountChange),
+    ).rejects.toThrowError('Transaction failed');
+
+    expect(entityManager.transaction).toHaveBeenCalledTimes(1);
+    expect(entityManager.save).not.toHaveBeenCalled();
+    expect(entityManager.query).not.toHaveBeenCalled();
   });
 });

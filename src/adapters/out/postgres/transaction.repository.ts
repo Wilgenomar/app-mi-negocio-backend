@@ -34,4 +34,19 @@ export class TransactionRepository implements ITransactionRepository {
     });
     return result;
   }
+
+  async saveAndUpdateBalance(
+    transaction: Transaction,
+    amountChange: number,
+  ): Promise<Transaction> {
+    return await this.entityManager.transaction(async (manager) => {
+      const savedTransaction = await manager.save(Transaction, transaction);
+
+      await manager.query(`UPDATE balances SET amount = amount + $1 `, [
+        amountChange,
+      ]);
+
+      return savedTransaction;
+    });
+  }
 }
