@@ -3,4 +3,8 @@ import { Transaction } from '../models/entities/transaction.entity';
 
 export interface ITransactionRepository {
   find(filter: FindTransactionsByFilterCommand): Promise<Transaction[]>;
+  saveAndUpdateBalance(
+    transaction: Transaction,
+    amountChange: number,
+  ): Promise<Transaction>;
 }

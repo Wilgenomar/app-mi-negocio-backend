@@ -1,17 +1,12 @@
 import {
-  IsEnum,
   IsNumber,
   Min,
   IsOptional,
   MaxLength,
   IsString,
 } from 'class-validator';
-import { TransactionType } from 'domain/models/enums/transaction-type.enum';
 
 export class CreateTransactionDto {
-  @IsEnum(TransactionType)
-  type: TransactionType;
-
   @IsNumber()
   @Min(500)
   amount: number;

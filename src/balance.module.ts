@@ -28,5 +28,6 @@ import { GetBalanceHandler } from './handlers/get-balance.handler';
       inject: ['BalanceRepository'],
     },
   ],
+  exports: ['BalanceRepository'],
 })
 export class BalanceModule {}

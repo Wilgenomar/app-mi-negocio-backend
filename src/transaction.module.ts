@@ -6,9 +6,14 @@ import { databaseProperties } from './adapters/out/postgres/client.config';
 import { TransactionRepository } from './adapters/out/postgres/transaction.repository';
 import { ITransactionRepository } from 'domain/interfaces/transaction-repository.interface';
 import { FindTransactionsByFiltersUseCase } from 'domain/usecases/find-transactions-by-filters.usecase';
+import { CreateTransactionUseCase } from 'domain/usecases/create-transaction.usecase';
+import { ReceiveTransactionHandler } from './handlers/receive-transaction.handler';
+import { BalanceModule } from './balance.module';
+import { IBalanceRepository } from 'domain/interfaces/balance.repository.interface';
 
 @Module({
   imports: [
+    BalanceModule,
     TypeOrmModule.forRoot({
       ...(databaseProperties as TypeOrmModuleOptions),
     }),
@@ -16,6 +21,7 @@ import { FindTransactionsByFiltersUseCase } from 'domain/usecases/find-transacti
   controllers: [TransactionController],
   providers: [
     FindTransactionsByFiltersHandler,
+    ReceiveTransactionHandler,
     {
       provide: 'TransactionRepository',
       useClass: TransactionRepository,
@@ -26,6 +32,19 @@ import { FindTransactionsByFiltersUseCase } from 'domain/usecases/find-transacti
         return new FindTransactionsByFiltersUseCase(transactionRepository);
       },
       inject: ['TransactionRepository'],
+    },
+    {
+      provide: 'CreateTransactionUseCase',
+      useFactory: (
+        transactionRepository: ITransactionRepository,
+        balanceRepository: IBalanceRepository,
+      ) => {
+        return new CreateTransactionUseCase(
+          transactionRepository,
+          balanceRepository,
+        );
+      },
+      inject: ['TransactionRepository', 'BalanceRepository'],
     },
   ],
 })
