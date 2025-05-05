@@ -22,13 +22,14 @@ describe('TransactionRepository', () => {
       page: 1,
       fromDate: new Date('2023-01-01'),
       toDate: new Date('2023-01-31'),
-      type: TransactionType.IN,
+      type: TransactionType.TRANSFER_IN,
     };
 
     const mockTransactions: Transaction[] = [
       new Transaction(
-        TransactionType.IN,
+        TransactionType.TRANSFER_IN,
         100,
+        'Test transaction',
         'Savings',
         '123456',
         'John Doe',
@@ -37,7 +38,6 @@ describe('TransactionRepository', () => {
         'Bank A',
         new Date('2023-01-01'),
         new Date('2023-01-01'),
-        'Test transaction',
       ),
     ];
 
@@ -49,7 +49,7 @@ describe('TransactionRepository', () => {
     expect(entityManager.find).toHaveBeenCalledWith(Transaction, {
       where: {
         createdAt: Between(filters.fromDate, filters.toDate),
-        type: TransactionType.IN,
+        type: TransactionType.TRANSFER_IN,
       } as FindOptionsWhere<Transaction>,
       order: { createdAt: 'DESC' },
       skip: 0,
@@ -65,8 +65,9 @@ describe('TransactionRepository', () => {
 
     const mockTransactions: Transaction[] = [
       new Transaction(
-        TransactionType.OUT,
+        TransactionType.TRANSFER_OUT,
         200,
+        'Another transaction',
         'Checking',
         '654321',
         'Jane Doe',
@@ -75,7 +76,6 @@ describe('TransactionRepository', () => {
         'Bank B',
         new Date('2023-02-01'),
         new Date('2023-02-01'),
-        'Another transaction',
       ),
     ];
 
@@ -100,8 +100,9 @@ describe('TransactionRepository', () => {
 
     const mockTransactions: Transaction[] = [
       new Transaction(
-        TransactionType.IN,
+        TransactionType.TRANSFER_IN,
         300,
+        'Sample transaction',
         'Savings',
         '789012',
         'Alice Smith',
@@ -110,7 +111,6 @@ describe('TransactionRepository', () => {
         'Bank C',
         new Date('2023-03-01'),
         new Date('2023-03-01'),
-        'Sample transaction',
       ),
     ];
 
@@ -167,8 +167,9 @@ describe('TransactionRepository', () => {
 
   it('should save a transaction and update the balance', async () => {
     const transaction = new Transaction(
-      TransactionType.IN,
+      TransactionType.TRANSFER_IN,
       100,
+      'Test transaction',
       'Savings',
       '123456',
       'John Doe',
@@ -177,7 +178,6 @@ describe('TransactionRepository', () => {
       'Bank A',
       new Date(),
       new Date(),
-      'Test transaction',
     );
 
     const amountChange = 100;
@@ -206,8 +206,9 @@ describe('TransactionRepository', () => {
 
   it('should throw an error if saving the transaction or updating the balance fails', async () => {
     const transaction = new Transaction(
-      TransactionType.IN,
+      TransactionType.TRANSFER_IN,
       100,
+      'Test transaction',
       'Savings',
       '123456',
       'John Doe',
@@ -216,7 +217,6 @@ describe('TransactionRepository', () => {
       'Bank A',
       new Date(),
       new Date(),
-      'Test transaction',
     );
 
     const amountChange = 100;

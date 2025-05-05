@@ -7,9 +7,11 @@ import { TransactionRepository } from './adapters/out/postgres/transaction.repos
 import { ITransactionRepository } from 'domain/interfaces/transaction-repository.interface';
 import { FindTransactionsByFiltersUseCase } from 'domain/usecases/find-transactions-by-filters.usecase';
 import { CreateTransactionUseCase } from 'domain/usecases/create-transaction.usecase';
-import { ReceiveTransactionHandler } from './handlers/receive-transaction.handler';
+import { TransferInTransactionHandler } from './handlers/transfer-in-transaction.handler';
 import { BalanceModule } from './balance.module';
 import { IBalanceRepository } from 'domain/interfaces/balance.repository.interface';
+import { WithdrawalTransactionHandler } from './handlers/withdrawal-transaction.handler';
+import { DepositTransactionHandler } from './handlers/deposit-transaction.handler';
 
 @Module({
   imports: [
@@ -21,7 +23,9 @@ import { IBalanceRepository } from 'domain/interfaces/balance.repository.interfa
   controllers: [TransactionController],
   providers: [
     FindTransactionsByFiltersHandler,
-    ReceiveTransactionHandler,
+    TransferInTransactionHandler,
+    WithdrawalTransactionHandler,
+    DepositTransactionHandler,
     {
       provide: 'TransactionRepository',
       useClass: TransactionRepository,

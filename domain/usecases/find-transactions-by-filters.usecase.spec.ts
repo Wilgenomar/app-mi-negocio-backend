@@ -21,14 +21,14 @@ describe('FindTransactionsByFiltersUseCase', () => {
       page: 1,
       fromDate: new Date('2023-01-01'),
       toDate: new Date('2023-01-31'),
-      type: TransactionType.IN,
+      type: TransactionType.TRANSFER_IN,
     };
 
     const mockTransactions: Transaction[] = [
       {
         id: 1,
         amount: 100,
-        type: TransactionType.IN,
+        type: TransactionType.TRANSFER_IN,
         createdAt: new Date('2023-01-01'),
         updatedAt: new Date('2023-01-01'),
         documentNumber: '123456789',
@@ -56,7 +56,7 @@ describe('FindTransactionsByFiltersUseCase', () => {
       page: 1,
       fromDate: new Date('2023-01-01'),
       toDate: new Date('2023-01-31'),
-      type: TransactionType.IN,
+      type: TransactionType.TRANSFER_IN,
     };
 
     transactionRepository.find.mockRejectedValue(new Error('Database error'));
@@ -74,7 +74,7 @@ describe('FindTransactionsByFiltersUseCase', () => {
       page: 1,
       fromDate: new Date('2023-01-01'),
       toDate: new Date('2023-01-31'),
-      type: TransactionType.IN,
+      type: TransactionType.TRANSFER_IN,
     };
 
     transactionRepository.find.mockRejectedValue('Unknown error');

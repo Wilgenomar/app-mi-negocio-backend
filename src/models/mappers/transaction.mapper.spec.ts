@@ -2,8 +2,9 @@ import { PaginationQueryDto } from '../dto/pagination-query.dto';
 import { FindTransactionsByFiltersDto } from '../dto/find-transactions-by-filters.dto';
 import { TransactionType } from '../../../domain/models/enums/transaction-type.enum';
 import { TransactionMapper } from './transaction.mapper';
-import { CreateTransactionDto } from '../dto/create-transaction.dto';
 import { Transaction } from '../../../domain/models/entities/transaction.entity';
+import { CreateTransferTransactionDto } from '../dto/create-transfer-transaction.dto';
+import { WithdrawalAndDepositTransactionDto } from '../dto/withdrawal-and-deposit-transaction.dto';
 
 describe('TransactionMapper', () => {
   describe('toUseCaseCommand', () => {
@@ -11,7 +12,7 @@ describe('TransactionMapper', () => {
       const filters: FindTransactionsByFiltersDto = {
         fromDate: '2023-01-01',
         toDate: '2023-01-31',
-        type: TransactionType.IN,
+        type: TransactionType.TRANSFER_IN,
       };
       const pagination: PaginationQueryDto = {
         limit: 10,
@@ -25,7 +26,7 @@ describe('TransactionMapper', () => {
         page: 2,
         fromDate: new Date('2023-01-01'),
         toDate: new Date('2023-01-31'),
-        type: TransactionType.IN,
+        type: TransactionType.TRANSFER_IN,
       });
     });
 
@@ -51,7 +52,7 @@ describe('TransactionMapper', () => {
       const filters: FindTransactionsByFiltersDto = {
         fromDate: '2023-01-01',
         toDate: '2023-01-31',
-        type: TransactionType.OUT,
+        type: TransactionType.TRANSFER_OUT,
       };
       const pagination: PaginationQueryDto = {};
 
@@ -62,67 +63,249 @@ describe('TransactionMapper', () => {
         page: 1,
         fromDate: new Date('2023-01-01'),
         toDate: new Date('2023-01-31'),
-        type: TransactionType.OUT,
+        type: TransactionType.TRANSFER_OUT,
       });
     });
   });
 
-  describe('toReceiveTransaction', () => {
-    it('should map CreateTransactionDto to a Transaction entity', () => {
-      const createTransactionDto: CreateTransactionDto = {
-        amount: 1000,
-        accountType: 'Savings',
-        accountNumber: '123456',
-        name: 'John Doe',
-        documentType: 'ID',
-        documentNumber: '123456789',
-        bank: 'Bank A',
-        description: 'Test transaction',
-      };
+  describe('Transfer Transaction', () => {
+    const createTransactionDto: CreateTransferTransactionDto = {
+      amount: 1000,
+      accountType: 'Savings',
+      accountNumber: '123456',
+      name: 'John Doe',
+      documentType: 'ID',
+      documentNumber: '123456789',
+      bank: 'Bank A',
+      description: 'Test transaction',
+    };
 
-      const result =
-        TransactionMapper.toReceiveTransaction(createTransactionDto);
+    describe('toTransferInTransaction', () => {
+      it('should map CreateTransferTransactionDto to a Transaction entity with type TRANSFER_IN', () => {
+        const result =
+          TransactionMapper.toTransferInTransaction(createTransactionDto);
 
-      expect(result).toBeInstanceOf(Transaction);
-      expect(result.amount).toEqual(1000);
-      expect(result.accountType).toEqual('Savings');
-      expect(result.accountNumber).toEqual('123456');
-      expect(result.name).toEqual('John Doe');
-      expect(result.documentType).toEqual('ID');
-      expect(result.documentNumber).toEqual('123456789');
-      expect(result.bank).toEqual('Bank A');
-      expect(result.description).toEqual('Test transaction');
-      expect(result.type).toEqual(TransactionType.IN);
-      expect(result.createdAt).toBeInstanceOf(Date);
-      expect(result.updatedAt).toBeInstanceOf(Date);
+        expect(result).toBeInstanceOf(Transaction);
+        expect(result.amount).toEqual(createTransactionDto.amount);
+        expect(result.accountType).toEqual(createTransactionDto.accountType);
+        expect(result.accountNumber).toEqual(
+          createTransactionDto.accountNumber,
+        );
+        expect(result.name).toEqual(createTransactionDto.name);
+        expect(result.documentType).toEqual(createTransactionDto.documentType);
+        expect(result.documentNumber).toEqual(
+          createTransactionDto.documentNumber,
+        );
+        expect(result.bank).toEqual(createTransactionDto.bank);
+        expect(result.description).toEqual(createTransactionDto.description);
+        expect(result.type).toEqual(TransactionType.TRANSFER_IN);
+        expect(result.createdAt).toBeInstanceOf(Date);
+        expect(result.updatedAt).toBeInstanceOf(Date);
+      });
+
+      it('should map CreateTransactionDto to a Transaction entity with type TRANSFER_IN and optional description undefined', () => {
+        const createTransactionDto: CreateTransferTransactionDto = {
+          amount: 1500,
+          accountType: 'Checking',
+          accountNumber: '654321',
+          name: 'Jane Doe',
+          documentType: 'Passport',
+          documentNumber: '987654321',
+          bank: 'Bank B',
+        };
+
+        const result =
+          TransactionMapper.toTransferInTransaction(createTransactionDto);
+
+        expect(result).toBeInstanceOf(Transaction);
+        expect(result.amount).toEqual(createTransactionDto.amount);
+        expect(result.accountType).toEqual(createTransactionDto.accountType);
+        expect(result.accountNumber).toEqual(
+          createTransactionDto.accountNumber,
+        );
+        expect(result.name).toEqual(createTransactionDto.name);
+        expect(result.documentType).toEqual(createTransactionDto.documentType);
+        expect(result.documentNumber).toEqual(
+          createTransactionDto.documentNumber,
+        );
+        expect(result.bank).toEqual(createTransactionDto.bank);
+        expect(result.description).toEqual(createTransactionDto.description);
+        expect(result.type).toEqual(TransactionType.TRANSFER_IN);
+        expect(result.createdAt).toBeInstanceOf(Date);
+        expect(result.updatedAt).toBeInstanceOf(Date);
+        expect(result.description).toBeUndefined();
+      });
     });
 
-    it('should map CreateTransactionDto to a Transaction entity with optional description undefined', () => {
-      const createTransactionDto: CreateTransactionDto = {
-        amount: 1500,
-        accountType: 'Checking',
-        accountNumber: '654321',
-        name: 'Jane Doe',
-        documentType: 'Passport',
-        documentNumber: '987654321',
-        bank: 'Bank B',
+    describe('toTransferOutTransaction', () => {
+      it('should map CreateTransferTransactionDto to a Transaction entity with type TRANSFER_IN', () => {
+        const result =
+          TransactionMapper.toTransferOutTransaction(createTransactionDto);
+
+        expect(result).toBeInstanceOf(Transaction);
+        expect(result.amount).toEqual(createTransactionDto.amount);
+        expect(result.accountType).toEqual(createTransactionDto.accountType);
+        expect(result.accountNumber).toEqual(
+          createTransactionDto.accountNumber,
+        );
+        expect(result.name).toEqual(createTransactionDto.name);
+        expect(result.documentType).toEqual(createTransactionDto.documentType);
+        expect(result.documentNumber).toEqual(
+          createTransactionDto.documentNumber,
+        );
+        expect(result.bank).toEqual(createTransactionDto.bank);
+        expect(result.description).toEqual(createTransactionDto.description);
+        expect(result.type).toEqual(TransactionType.TRANSFER_OUT);
+        expect(result.createdAt).toBeInstanceOf(Date);
+        expect(result.updatedAt).toBeInstanceOf(Date);
+      });
+
+      it('should map CreateTransactionDto to a Transaction entity with type TRANSFER_IN and optional description undefined', () => {
+        const createTransactionDto: CreateTransferTransactionDto = {
+          amount: 1500,
+          accountType: 'Checking',
+          accountNumber: '654321',
+          name: 'Jane Doe',
+          documentType: 'Passport',
+          documentNumber: '987654321',
+          bank: 'Bank B',
+        };
+
+        const result =
+          TransactionMapper.toTransferOutTransaction(createTransactionDto);
+
+        expect(result).toBeInstanceOf(Transaction);
+        expect(result.amount).toEqual(createTransactionDto.amount);
+        expect(result.accountType).toEqual(createTransactionDto.accountType);
+        expect(result.accountNumber).toEqual(
+          createTransactionDto.accountNumber,
+        );
+        expect(result.name).toEqual(createTransactionDto.name);
+        expect(result.documentType).toEqual(createTransactionDto.documentType);
+        expect(result.documentNumber).toEqual(
+          createTransactionDto.documentNumber,
+        );
+        expect(result.bank).toEqual(createTransactionDto.bank);
+        expect(result.description).toEqual(createTransactionDto.description);
+        expect(result.type).toEqual(TransactionType.TRANSFER_OUT);
+        expect(result.createdAt).toBeInstanceOf(Date);
+        expect(result.updatedAt).toBeInstanceOf(Date);
+        expect(result.description).toBeUndefined();
+      });
+    });
+  });
+
+  describe('toWithdrawalTransaction', () => {
+    const createTransactionDto: WithdrawalAndDepositTransactionDto = {
+      amount: 1000,
+      description: 'Test transaction',
+    };
+
+    it('should map CreateTransferTransactionDto to a Transaction entity with type WITHDRAWAL', () => {
+      const result =
+        TransactionMapper.toWithdrawalTransaction(createTransactionDto);
+
+      expect(result).toBeInstanceOf(Transaction);
+      expect(result.amount).toEqual(createTransactionDto.amount);
+      expect(result.accountType).toBeUndefined();
+      expect(result.accountNumber).toBeUndefined();
+      expect(result.name).toBeUndefined();
+      expect(result.documentType).toBeUndefined();
+      expect(result.documentNumber).toBeUndefined();
+      expect(result.bank).toBeUndefined();
+      expect(result.description).toEqual(createTransactionDto.description);
+      expect(result.type).toEqual(TransactionType.WITHDRAWAL);
+      expect(result.createdAt).toBeUndefined();
+      expect(result.updatedAt).toBeUndefined();
+    });
+
+    it('should map CreateTransactionDto to a Transaction entity with type WITHDRAWAL and optional description undefined', () => {
+      const createTransactionDto: WithdrawalAndDepositTransactionDto = {
+        amount: 1000,
       };
 
       const result =
-        TransactionMapper.toReceiveTransaction(createTransactionDto);
+        TransactionMapper.toWithdrawalTransaction(createTransactionDto);
 
       expect(result).toBeInstanceOf(Transaction);
-      expect(result.amount).toEqual(1500);
-      expect(result.accountType).toEqual('Checking');
-      expect(result.accountNumber).toEqual('654321');
-      expect(result.name).toEqual('Jane Doe');
-      expect(result.documentType).toEqual('Passport');
-      expect(result.documentNumber).toEqual('987654321');
-      expect(result.bank).toEqual('Bank B');
+      expect(result.amount).toEqual(createTransactionDto.amount);
+      expect(result.accountType).toBeUndefined();
+      expect(result.accountNumber).toBeUndefined();
+      expect(result.name).toBeUndefined();
+      expect(result.documentType).toBeUndefined();
+      expect(result.documentNumber).toBeUndefined();
+      expect(result.bank).toBeUndefined();
       expect(result.description).toBeUndefined();
-      expect(result.type).toEqual(TransactionType.IN);
-      expect(result.createdAt).toBeInstanceOf(Date);
-      expect(result.updatedAt).toBeInstanceOf(Date);
+      expect(result.type).toEqual(TransactionType.WITHDRAWAL);
+      expect(result.createdAt).toBeUndefined();
+      expect(result.updatedAt).toBeUndefined();
+    });
+
+    // public static (
+    //   withdrawalTransaction: WithdrawalAndDepositTransactionDto,
+    // ): Transaction {
+    //   return new Transaction(
+    //     TransactionType.WITHDRAWAL,
+    //     withdrawalTransaction.amount,
+    //     withdrawalTransaction.description,
+    //   );
+    // }
+
+    // public static toDepositTransaction(
+    //   withdrawalTransaction: ,
+    // ): Transaction {
+    //   return new Transaction(
+    //     TransactionType.DEPOSIT,
+    //     withdrawalTransaction.amount,
+    //     withdrawalTransaction.description,
+    //   );
+    // }
+  });
+
+  describe('toDepositTransaction', () => {
+    const createTransactionDto: WithdrawalAndDepositTransactionDto = {
+      amount: 1000,
+      description: 'Test transaction',
+    };
+
+    it('should map CreateTransferTransactionDto to a Transaction entity with type WITHDRAWAL', () => {
+      const result =
+        TransactionMapper.toDepositTransaction(createTransactionDto);
+
+      expect(result).toBeInstanceOf(Transaction);
+      expect(result.amount).toEqual(createTransactionDto.amount);
+      expect(result.accountType).toBeUndefined();
+      expect(result.accountNumber).toBeUndefined();
+      expect(result.name).toBeUndefined();
+      expect(result.documentType).toBeUndefined();
+      expect(result.documentNumber).toBeUndefined();
+      expect(result.bank).toBeUndefined();
+      expect(result.description).toEqual(createTransactionDto.description);
+      expect(result.type).toEqual(TransactionType.DEPOSIT);
+      expect(result.createdAt).toBeUndefined();
+      expect(result.updatedAt).toBeUndefined();
+    });
+
+    it('should map CreateTransactionDto to a Transaction entity with type WITHDRAWAL and optional description undefined', () => {
+      const createTransactionDto: WithdrawalAndDepositTransactionDto = {
+        amount: 1000,
+      };
+
+      const result =
+        TransactionMapper.toDepositTransaction(createTransactionDto);
+
+      expect(result).toBeInstanceOf(Transaction);
+      expect(result.amount).toEqual(createTransactionDto.amount);
+      expect(result.accountType).toBeUndefined();
+      expect(result.accountNumber).toBeUndefined();
+      expect(result.name).toBeUndefined();
+      expect(result.documentType).toBeUndefined();
+      expect(result.documentNumber).toBeUndefined();
+      expect(result.bank).toBeUndefined();
+      expect(result.description).toBeUndefined();
+      expect(result.type).toEqual(TransactionType.DEPOSIT);
+      expect(result.createdAt).toBeUndefined();
+      expect(result.updatedAt).toBeUndefined();
     });
   });
 });

@@ -23,7 +23,7 @@ describe('FindTransactionsByFiltersHandler', () => {
     const filters: FindTransactionsByFiltersDto = {
       fromDate: '2023-01-01',
       toDate: '2023-01-31',
-      type: TransactionType.IN,
+      type: TransactionType.TRANSFER_IN,
     };
     const pagination: PaginationQueryDto = {
       limit: 10,
@@ -33,7 +33,7 @@ describe('FindTransactionsByFiltersHandler', () => {
       {
         id: 1,
         amount: 100,
-        type: TransactionType.IN,
+        type: TransactionType.TRANSFER_IN,
         accountNumber: '123456789',
         description: 'Test transaction',
         accountType: 'SAVINGS',
@@ -56,7 +56,7 @@ describe('FindTransactionsByFiltersHandler', () => {
       page: 1,
       fromDate: new Date('2023-01-01'),
       toDate: new Date('2023-01-31'),
-      type: TransactionType.IN,
+      type: TransactionType.TRANSFER_IN,
     });
     useCase.execute.mockResolvedValue(mockTransactions);
 
@@ -74,7 +74,7 @@ describe('FindTransactionsByFiltersHandler', () => {
     const filters: FindTransactionsByFiltersDto = {
       fromDate: '2023-01-01',
       toDate: '2023-01-31',
-      type: TransactionType.IN,
+      type: TransactionType.TRANSFER_IN,
     };
     const pagination: PaginationQueryDto = {
       limit: 10,
@@ -87,7 +87,7 @@ describe('FindTransactionsByFiltersHandler', () => {
       page: 1,
       fromDate: new Date('2023-01-01'),
       toDate: new Date('2023-01-31'),
-      type: TransactionType.IN,
+      type: TransactionType.TRANSFER_IN,
     });
     useCase.execute.mockRejectedValue(new Error(errorMessage));
 
